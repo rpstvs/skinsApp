@@ -1,38 +1,31 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"os"
+	"time"
 )
 
 func main() {
-	URL := fmt.Sprintf("https://steamcommunity.com/market/search/render/?query=&start=0&count=100&search_descriptions=0&norender=1&sort_column=popular&sort_dir=desc&appid=730")
-	req, err := http.NewRequest("GET", URL, nil)
+	totalItems := getTotalItems()
 
-	if err != nil {
-		fmt.Errorf("Error occurred: %s", err)
-		os.Exit(-1)
+	cfg := InitConfig(totalItems)
+
+	for i := 0; i < totalItems; i += 100 {
+		time.Sleep(1 * time.Second)
+		fmt.Println("Starting a new thread %d", i)
+		cfg.wg.Add(1)
+		go cfg.get_skins(i)
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	go func() {
+		cfg.wg.Wait()
+		close(cfg.ch)
+	}()
 
-	if err != nil {
-		fmt.Errorf("Error occurred: %s", err)
+	allresults := make([]interface{}, 0)
+
+	for _, results := range <-cfg.ch {
+		allresults = append(allresults, results)
 	}
-
-	data, _ := io.ReadAll(resp.Body)
-
-	defer resp.Body.Close()
-
-	results := &SearchResult{}
-
-	err = json.Unmarshal(data, &results)
-
-	for _, result := range results.Results {
-		fmt.Println("Item: " + result.HashName)
-	}
-
+	fmt.Println("Fetched %d items \n", len(allresults))
 }

@@ -1,7 +1,20 @@
 package main
 
+import "sync"
+
+type Configure struct {
+	wg         *sync.WaitGroup
+	ch         chan []interface{}
+	totalItems int
+}
+
 type Item struct {
-	Name string `json:"name"`
+	Name  string  `json:"name"`
+	Price float32 `json:"price"`
+}
+
+type Results struct {
+	Results []interface{}
 }
 
 type SearchResult struct {
