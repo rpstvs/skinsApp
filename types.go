@@ -4,7 +4,7 @@ import "sync"
 
 type Configure struct {
 	wg         *sync.WaitGroup
-	ch         chan []interface{}
+	ch         chan SearchResult
 	totalItems int
 }
 

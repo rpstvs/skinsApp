@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 )
@@ -15,23 +16,36 @@ func (cfg *Configure) get_skins(start int) {
 	req, err := http.NewRequest("GET", URL, nil)
 
 	if err != nil {
-		fmt.Errorf("Error occurred: %s", err)
+		log.Println(err)
 		os.Exit(-1)
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 
 	if err != nil {
-		fmt.Errorf("Error occurred: %s", err)
+		log.Println(err)
 	}
 
-	data, _ := io.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		log.Println(err)
+	}
 
 	defer resp.Body.Close()
 
-	results := &Results{}
+	results := &SearchResult{}
 
 	err = json.Unmarshal(data, &results)
 
-	cfg.ch <- results.Results
+	if err != nil {
+		log.Println(err)
+	}
+
+	if results == nil {
+		log.Println("Results is nil, skipping")
+		return
+	}
+
+	cfg.ch <- *results
 }
