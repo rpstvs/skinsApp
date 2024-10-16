@@ -1,20 +1,21 @@
 package main
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/rpstvs/skinsApp/database"
+)
 
 type Configure struct {
 	wg         *sync.WaitGroup
 	ch         chan SearchResult
 	totalItems int
+	db         *database.Queries
 }
 
 type Item struct {
 	Name  string  `json:"name"`
 	Price float32 `json:"price"`
-}
-
-type Results struct {
-	Results []interface{}
 }
 
 type SearchResult struct {

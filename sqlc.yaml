@@ -1,0 +1,16 @@
+version: "2"
+sql:
+  - schema: "sql/schema"
+    queries: "sql/queries"
+    engine: "postgresql"
+    gen:
+      go:
+        out: "database"
+        package: "database"
+        overrides:
+          - db_type: "pg_catalog.numeric"
+            go_type: "float64"
+            nullable: false
+          - db_type: "numeric"
+            go_type: "sql.NullFloat64"
+            nullable: true
