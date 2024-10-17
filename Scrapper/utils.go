@@ -1,4 +1,4 @@
-package main
+package Scrapper
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func getTotalItems() int {
+func GetTotalItems() int {
 	URL := fmt.Sprintf("https://steamcommunity.com/market/search/render/?query=&start=0&count=10&search_descriptions=0&norender=1&sort_column=popular&sort_dir=desc&appid=730")
 	req, err := http.NewRequest("GET", URL, nil)
 
@@ -40,8 +40,14 @@ func getTotalItems() int {
 	}
 
 	if results.TotalCount == 0 {
-		getTotalItems()
+		GetTotalItems()
 	}
 
 	return results.TotalCount
+}
+
+func BuildImageURL(imageId string) string {
+	tmp := "https://community.akamai.steamstatic.com/economy/image/"
+
+	return tmp + imageId
 }

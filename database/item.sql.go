@@ -7,22 +7,24 @@ package database
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 const createItem = `-- name: CreateItem :one
 INSERT INTO Items (
-        classid,
+        id,
         ItemName,
         ImageUrl,
         DayChange,
         WeekChange
     )
 VALUES ($1, $2, $3, $4, $5)
-RETURNING classid, itemname, daychange, weekchange, imageurl
+RETURNING id, itemname, daychange, weekchange, imageurl
 `
 
 type CreateItemParams struct {
-	Classid    int64
+	ID         uuid.UUID
 	Itemname   string
 	Imageurl   string
 	Daychange  float64
@@ -31,7 +33,7 @@ type CreateItemParams struct {
 
 func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, error) {
 	row := q.db.QueryRowContext(ctx, createItem,
-		arg.Classid,
+		arg.ID,
 		arg.Itemname,
 		arg.Imageurl,
 		arg.Daychange,
@@ -39,7 +41,7 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, e
 	)
 	var i Item
 	err := row.Scan(
-		&i.Classid,
+		&i.ID,
 		&i.Itemname,
 		&i.Daychange,
 		&i.Weekchange,

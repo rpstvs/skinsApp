@@ -1,6 +1,6 @@
 -- name: CreateItem :one
 INSERT INTO Items (
-        classid,
+        id,
         ItemName,
         ImageUrl,
         DayChange,

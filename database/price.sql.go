@@ -8,6 +8,8 @@ package database
 import (
 	"context"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const addPrice = `-- name: AddPrice :many
@@ -18,7 +20,7 @@ RETURNING pricedate, item_id, price
 
 type AddPriceParams struct {
 	Pricedate time.Time
-	ItemID    int64
+	ItemID    uuid.UUID
 	Price     float64
 }
 

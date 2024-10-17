@@ -1,17 +1,22 @@
-package main
+package Scrapper
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/google/uuid"
+	"github.com/rpstvs/skinsApp/database"
 )
 
-func (cfg *Configure) get_skins(start int) {
+func (cfg *Configure) Get_skins(start int) {
 
 	defer cfg.wg.Done()
+	//time.Sleep(10 * time.Second)
 	URL := fmt.Sprintf("https://steamcommunity.com/market/search/render/?query=&start=%d&count=100&search_descriptions=0&norender=1&sort_column=popular&sort_dir=desc&appid=730", start)
 	req, err := http.NewRequest("GET", URL, nil)
 
@@ -43,9 +48,19 @@ func (cfg *Configure) get_skins(start int) {
 	}
 
 	if results == nil {
-		log.Println("Results is nil, skipping")
+		log.Printf("HTTP STATUS CODE: %d - Results is nil, skipping", resp.StatusCode)
 		return
 	}
 
-	cfg.ch <- *results
+	for _, item := range results.Results {
+		cfg.db.CreateItem(context.Background(), database.CreateItemParams{
+			ID:         uuid.New(),
+			Itemname:   item.HashName,
+			Imageurl:   BuildImageURL(item.AssetDescription.IconURL),
+			Daychange:  0.00,
+			Weekchange: 0.00,
+		})
+		//log.Printf("Added Item: %s \n", item.HashName)
+	}
+
 }

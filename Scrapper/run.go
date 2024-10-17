@@ -1,25 +1,18 @@
-package main
+package Scrapper
 
 import (
 	"fmt"
-	"runtime"
 	"time"
 )
 
-func main() {
-	totalItems := getTotalItems()
+func (cfg *Configure) Run_Scrapper() {
 
-	maxProcs := runtime.GOMAXPROCS(0) // Get current setting
-	fmt.Println("Max threads:", maxProcs)
-
-	cfg := InitConfig(totalItems)
-
-	for i := 0; i < 2000; i += 100 {
-		time.Sleep(10 * time.Second)
-
-		fmt.Println("Starting a new thread %d", i)
+	for i := 0; i < cfg.totalItems; i += 100 {
+		time.Sleep(20 * time.Second)
 		cfg.wg.Add(1)
-		go cfg.get_skins(i)
+		fmt.Println("Starting a new thread %d", i)
+
+		go cfg.Get_skins(i)
 	}
 
 	go func() {
@@ -35,5 +28,4 @@ func main() {
 	}
 
 	fmt.Println(len(allresults))
-
 }
