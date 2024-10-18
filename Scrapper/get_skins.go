@@ -53,14 +53,14 @@ func (cfg *Configure) Get_skins(start int) {
 	}
 
 	for _, item := range results.Results {
-		cfg.db.CreateItem(context.Background(), database.CreateItemParams{
+		x, err := cfg.db.CreateItem(context.Background(), database.CreateItemParams{
 			ID:         uuid.New(),
 			Itemname:   item.HashName,
 			Imageurl:   BuildImageURL(item.AssetDescription.IconURL),
 			Daychange:  0.00,
 			Weekchange: 0.00,
 		})
-		//log.Printf("Added Item: %s \n", item.HashName)
+		log.Printf("Added Item: %s and err: %s \n", x.Itemname, err)
 	}
 
 }
