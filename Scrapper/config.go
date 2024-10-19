@@ -12,7 +12,7 @@ import (
 
 func InitConfig(total_items int) *Configure {
 	dbUrl := os.Getenv("DATABASE_URL")
-	fmt.Println(dbUrl)
+
 	db, err := sql.Open("postgres", dbUrl)
 	queries := database.New(db)
 	if err != nil {

@@ -2,8 +2,6 @@ package Scrapper
 
 import (
 	"context"
-	"log"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/rpstvs/skinsApp/database"
@@ -13,7 +11,7 @@ func (cfg *Configure) writeToDb(data *SearchResult) {
 
 	ctx := context.Background()
 	for _, item := range data.Results {
-		_, err := cfg.db.CreateItem(ctx, database.CreateItemParams{
+		cfg.db.CreateItem(ctx, database.CreateItemParams{
 			ID:         uuid.New(),
 			Itemname:   item.HashName,
 			Imageurl:   BuildImageURL(item.AssetDescription.IconURL),
@@ -21,16 +19,12 @@ func (cfg *Configure) writeToDb(data *SearchResult) {
 			Weekchange: 0.00,
 		})
 
-		if err != nil {
-
-			id, _ := cfg.db.GetItemIDbyName(ctx, item.HashName)
-
-			cfg.db.AddPrice(ctx, database.AddPriceParams{
-				Pricedate: time.Now().UTC(),
-			})
-		}
-		log.Printf("Added Item: %s and err: %s \n", x.Itemname, err)
+		id, _ := cfg.db.GetItemIDbyName(ctx, item.HashName)
+		cfg.db.AddPrice(ctx, database.AddPriceParams{
+			Pricedate: ConvertDate(),
+			ItemID:    id,
+			Price:     PriceConverter(item.SalePriceText),
+		})
+		//log.Printf("Added Item: %s and err: %s \n", x.Itemname, err)
 	}
 }
-
-//TODO TRUNCATE DATE

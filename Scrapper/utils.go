@@ -7,6 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
+	"time"
 )
 
 func GetTotalItems() int {
@@ -50,4 +53,40 @@ func BuildImageURL(imageId string) string {
 	tmp := "https://community.akamai.steamstatic.com/economy/image/"
 
 	return tmp + imageId
+}
+
+func ConvertDate() time.Time {
+	currentTime := time.Now()
+
+	// Truncate to get DD-MM-YYYY
+	currentDate := currentTime.Truncate(24 * time.Hour)
+
+	return currentDate
+}
+
+func PriceConverter(priceStr string) float64 {
+	if len(priceStr) > 7 {
+		priceStr = strings.ReplaceAll(priceStr, "$", "")
+		priceStr = strings.ReplaceAll(priceStr, ",", "")
+		priceStr = strings.ReplaceAll(priceStr, "-", "0")
+
+		price, err := strconv.ParseFloat(priceStr, 64)
+
+		if err != nil {
+			log.Println("error parsing price")
+		}
+
+		return price
+	}
+	priceStr = strings.ReplaceAll(priceStr, "$", "")
+	priceStr = strings.ReplaceAll(priceStr, ",", ".")
+	priceStr = strings.ReplaceAll(priceStr, "-", "0")
+
+	price, err := strconv.ParseFloat(priceStr, 64)
+
+	if err != nil {
+		log.Println("error parsing price")
+	}
+
+	return price
 }
