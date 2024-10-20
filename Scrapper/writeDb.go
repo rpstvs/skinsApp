@@ -25,6 +25,11 @@ func (cfg *Configure) writeToDb(data *SearchResult) {
 			ItemID:    id,
 			Price:     PriceConverter(item.SalePriceText),
 		})
+
+		priceHistory, _ := cfg.db.GetPricebyId(ctx, id)
+
+		dailyChange, weeklyChange, monthlyChange := PriceChange(priceHistory)
+
 		//log.Printf("Added Item: %s and err: %s \n", x.Itemname, err)
 	}
 }

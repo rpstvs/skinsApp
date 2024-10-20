@@ -90,3 +90,39 @@ func PriceConverter(priceStr string) float64 {
 
 	return price
 }
+
+func PriceChange(prices []float64) (float64, float64, float64) {
+	if len(prices) == 0 {
+		return 0.00, 0.00, 0.00
+	}
+
+	dailyChange := ((prices[0] - prices[1]) / prices[1]) * 100
+
+	WeeklyChange := func(x []float64) float64 {
+		if len(x) < 7 {
+			return 0.0
+		}
+		var sum float64
+		for i := range x {
+			sum += x[i]
+		}
+		average := sum / 7.0
+		return ((prices[0] - average) / average) * 100
+	}
+	weeklychange := WeeklyChange(prices[:7])
+
+	MonthlyChange := func(x []float64) float64 {
+		if len(x) < 30 {
+			return 0.0
+		}
+		var sum float64
+		for i := range x {
+			sum += x[i]
+		}
+		average := sum / 30
+		return ((prices[0] - average) / average) * 100
+	}
+	monthlyChange := MonthlyChange(prices[:30])
+
+	return dailyChange, weeklychange, monthlyChange
+}
