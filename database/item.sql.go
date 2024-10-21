@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const createItem = `-- name: CreateItem :one
+const createItem = `-- name: CreateItem :exec
 INSERT INTO Items (
         id,
         ItemName,
@@ -31,23 +31,15 @@ type CreateItemParams struct {
 	Weekchange float64
 }
 
-func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, error) {
-	row := q.db.QueryRowContext(ctx, createItem,
+func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) error {
+	_, err := q.db.ExecContext(ctx, createItem,
 		arg.ID,
 		arg.Itemname,
 		arg.Imageurl,
 		arg.Daychange,
 		arg.Weekchange,
 	)
-	var i Item
-	err := row.Scan(
-		&i.ID,
-		&i.Itemname,
-		&i.Daychange,
-		&i.Weekchange,
-		&i.Imageurl,
-	)
-	return i, err
+	return err
 }
 
 const getItemIDbyName = `-- name: GetItemIDbyName :one
@@ -61,4 +53,22 @@ func (q *Queries) GetItemIDbyName(ctx context.Context, itemname string) (uuid.UU
 	var id uuid.UUID
 	err := row.Scan(&id)
 	return id, err
+}
+
+const updatePriceChange = `-- name: UpdatePriceChange :exec
+UPDATE Items
+SET DayChange = $1,
+    WeekChange = $2
+WHERE Id = $3
+`
+
+type UpdatePriceChangeParams struct {
+	Daychange  float64
+	Weekchange float64
+	ID         uuid.UUID
+}
+
+func (q *Queries) UpdatePriceChange(ctx context.Context, arg UpdatePriceChangeParams) error {
+	_, err := q.db.ExecContext(ctx, updatePriceChange, arg.Daychange, arg.Weekchange, arg.ID)
+	return err
 }

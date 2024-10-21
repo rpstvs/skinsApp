@@ -26,5 +26,6 @@ func InitConfig(total_items int) *Configure {
 		ch:         ch,
 		totalItems: total_items,
 		db:         queries,
+		mu:         &sync.Mutex{},
 	}
 }

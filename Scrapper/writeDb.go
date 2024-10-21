@@ -2,15 +2,16 @@ package Scrapper
 
 import (
 	"context"
+	"log"
 
 	"github.com/google/uuid"
 	"github.com/rpstvs/skinsApp/database"
 )
 
 func (cfg *Configure) writeToDb(data *SearchResult) {
-
 	ctx := context.Background()
 	for _, item := range data.Results {
+		cfg.mu.Lock()
 		cfg.db.CreateItem(ctx, database.CreateItemParams{
 			ID:         uuid.New(),
 			Itemname:   item.HashName,
@@ -26,10 +27,25 @@ func (cfg *Configure) writeToDb(data *SearchResult) {
 			Price:     PriceConverter(item.SalePriceText),
 		})
 
-		priceHistory, _ := cfg.db.GetPricebyId(ctx, id)
+		cfg.UpdateChange(ctx, id)
+		cfg.mu.Unlock()
+		//log.Printf("Updating Item: %s - Daily Change %f.2 \n", item.HashName, dailyChange)
+	}
+}
 
-		dailyChange, weeklyChange, monthlyChange := PriceChange(priceHistory)
+func (cfg *Configure) UpdateChange(ctx context.Context, id uuid.UUID) {
 
-		//log.Printf("Added Item: %s and err: %s \n", x.Itemname, err)
+	priceHistory, _ := cfg.db.GetPricebyId(ctx, id)
+
+	dailyChange, weeklyChange, _ := PriceChange(priceHistory)
+
+	err := cfg.db.UpdatePriceChange(ctx, database.UpdatePriceChangeParams{
+		Daychange:  dailyChange,
+		Weekchange: weeklyChange,
+		ID:         id,
+	})
+
+	if err != nil {
+		log.Println(err)
 	}
 }

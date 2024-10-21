@@ -11,6 +11,7 @@ type Configure struct {
 	ch         chan SearchResult
 	totalItems int
 	db         *database.Queries
+	mu         *sync.Mutex
 }
 
 type Item struct {

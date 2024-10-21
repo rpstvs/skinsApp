@@ -92,7 +92,7 @@ func PriceConverter(priceStr string) float64 {
 }
 
 func PriceChange(prices []float64) (float64, float64, float64) {
-	if len(prices) == 0 {
+	if len(prices) < 2 {
 		return 0.00, 0.00, 0.00
 	}
 
@@ -103,26 +103,26 @@ func PriceChange(prices []float64) (float64, float64, float64) {
 			return 0.0
 		}
 		var sum float64
-		for i := range x {
+		for i := range x[:7] {
 			sum += x[i]
 		}
 		average := sum / 7.0
 		return ((prices[0] - average) / average) * 100
 	}
-	weeklychange := WeeklyChange(prices[:7])
+	weeklychange := WeeklyChange(prices)
 
 	MonthlyChange := func(x []float64) float64 {
 		if len(x) < 30 {
 			return 0.0
 		}
 		var sum float64
-		for i := range x {
+		for i := range x[:30] {
 			sum += x[i]
 		}
 		average := sum / 30
 		return ((prices[0] - average) / average) * 100
 	}
-	monthlyChange := MonthlyChange(prices[:30])
+	monthlyChange := MonthlyChange(prices)
 
 	return dailyChange, weeklychange, monthlyChange
 }
