@@ -2,6 +2,7 @@ package Scrapper
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/google/uuid"
@@ -12,15 +13,19 @@ func (cfg *Configure) writeToDb(data *SearchResult) {
 	ctx := context.Background()
 	for _, item := range data.Results {
 		cfg.mu.Lock()
-		cfg.db.CreateItem(ctx, database.CreateItemParams{
-			ID:         uuid.New(),
-			Itemname:   item.HashName,
-			Imageurl:   BuildImageURL(item.AssetDescription.IconURL),
-			Daychange:  0.00,
-			Weekchange: 0.00,
-		})
+		id, err := cfg.db.GetItemIDbyName(ctx, item.HashName)
 
-		id, _ := cfg.db.GetItemIDbyName(ctx, item.HashName)
+		if err != nil {
+			fmt.Println("item not in db creating one")
+			cfg.db.CreateItem(ctx, database.CreateItemParams{
+				ID:         uuid.New(),
+				Itemname:   item.HashName,
+				Imageurl:   BuildImageURL(item.AssetDescription.IconURL),
+				Daychange:  0.00,
+				Weekchange: 0.00,
+			})
+		}
+
 		cfg.db.AddPrice(ctx, database.AddPriceParams{
 			Pricedate: ConvertDate(),
 			ItemID:    id,
@@ -29,7 +34,7 @@ func (cfg *Configure) writeToDb(data *SearchResult) {
 
 		cfg.UpdateChange(ctx, id)
 		cfg.mu.Unlock()
-		//log.Printf("Updating Item: %s - Daily Change %f.2 \n", item.HashName, dailyChange)
+		log.Printf("Updating Item: %s - Daily Change %s.2 \n", item.HashName, item.SalePriceText)
 	}
 }
 
