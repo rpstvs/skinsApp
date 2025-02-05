@@ -26,11 +26,17 @@ func (cfg *Configure) writeToDb(data *SearchResult) {
 			})
 		}
 
-		cfg.db.AddPrice(ctx, database.AddPriceParams{
+		_, err = cfg.db.AddPrice(ctx, database.AddPriceParams{
 			Pricedate: ConvertDate(),
 			ItemID:    id,
 			Price:     PriceConverter(item.SalePriceText),
 		})
+
+		if err != nil {
+			log.Printf("Item: %s already updated", item.HashName)
+			cfg.mu.Unlock()
+			continue
+		}
 
 		cfg.UpdateChange(ctx, id)
 		cfg.mu.Unlock()
@@ -53,4 +59,5 @@ func (cfg *Configure) UpdateChange(ctx context.Context, id uuid.UUID) {
 	if err != nil {
 		log.Println(err)
 	}
+
 }

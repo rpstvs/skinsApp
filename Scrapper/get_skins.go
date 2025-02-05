@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 )
 
 func (cfg *Configure) Get_skins(start int) {
@@ -18,7 +17,7 @@ func (cfg *Configure) Get_skins(start int) {
 
 	if err != nil {
 		log.Println(err)
-		os.Exit(-1)
+
 	}
 
 	resp, err := http.DefaultClient.Do(req)
