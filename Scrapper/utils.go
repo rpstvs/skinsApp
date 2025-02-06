@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -18,7 +17,7 @@ func GetTotalItems() int {
 
 	if err != nil {
 		log.Println(err)
-		os.Exit(-1)
+
 	}
 
 	resp, err := http.DefaultClient.Do(req)

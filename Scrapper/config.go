@@ -19,11 +19,9 @@ func InitConfig(total_items int) *Configure {
 		fmt.Println(err)
 		log.Println("Error opening connection with DB")
 	}
-	ch := make(chan SearchResult, total_items/100)
 
 	return &Configure{
 		wg:         &sync.WaitGroup{},
-		ch:         ch,
 		totalItems: total_items,
 		db:         queries,
 		mu:         &sync.Mutex{},

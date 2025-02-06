@@ -8,7 +8,6 @@ import (
 
 type Configure struct {
 	wg         *sync.WaitGroup
-	ch         chan SearchResult
 	totalItems int
 	db         *database.Queries
 	mu         *sync.Mutex
