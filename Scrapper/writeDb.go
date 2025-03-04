@@ -2,7 +2,6 @@ package Scrapper
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/google/uuid"
@@ -16,14 +15,27 @@ func (cfg *Configure) writeToDb(data *SearchResult) {
 		id, err := cfg.db.GetItemIDbyName(ctx, item.HashName)
 
 		if err != nil {
-			fmt.Println("item not in db creating one")
-			cfg.db.CreateItem(ctx, database.CreateItemParams{
-				ID:         uuid.New(),
-				Itemname:   item.HashName,
+			firstId := uuid.New()
+			err = cfg.db.CreateItem(ctx, database.CreateItemParams{
+				ID:         firstId,
+				Classid:    item.AssetDescription.Classid,
+				Itemname:   item.AssetDescription.MarketHashName,
 				Imageurl:   BuildImageURL(item.AssetDescription.IconURL),
 				Daychange:  0.00,
 				Weekchange: 0.00,
 			})
+			if err != nil {
+				log.Printf("Item: %s not added to db because %s \n", item.AssetDescription.MarketHashName, err)
+			}
+
+			_, _ = cfg.db.AddPrice(ctx, database.AddPriceParams{
+				Pricedate: ConvertDate(),
+				ItemID:    firstId,
+				Price:     PriceConverter(item.SalePriceText),
+			})
+			log.Printf("Item Added: %s - Daily Change %s.2 \n", item.HashName, item.SalePriceText)
+			cfg.mu.Unlock()
+			continue
 		}
 
 		_, err = cfg.db.AddPrice(ctx, database.AddPriceParams{
@@ -33,7 +45,7 @@ func (cfg *Configure) writeToDb(data *SearchResult) {
 		})
 
 		if err != nil {
-			log.Printf("Item: %s already updated", item.HashName)
+			log.Printf("Item: %s already updated with err %s", item.HashName, err)
 			cfg.mu.Unlock()
 			continue
 		}

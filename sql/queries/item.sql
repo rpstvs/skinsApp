@@ -1,12 +1,13 @@
 -- name: CreateItem :exec
 INSERT INTO Items (
         id,
+        Classid,
         ItemName,
         ImageUrl,
         DayChange,
         WeekChange
     )
-VALUES ($1, $2, $3, $4, $5)
+VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING *;
 -- name: GetItemIDbyName :one
 SELECT id
