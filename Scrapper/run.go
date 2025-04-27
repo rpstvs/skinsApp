@@ -1,30 +1,21 @@
 package Scrapper
 
-import "log"
+import (
+	"log"
+	"time"
+)
 
 func (cfg *Configure) Run_Scrapper() {
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
 	numWorkers := 50
 	jobs := make(chan int, 1000)
-	/*
-
-		for i := 0; i < cfg.totalItems; i += 100 {
-			time.Sleep(15 * time.Second)
-			cfg.wg.Add(1)
-			log.Printf("Starting a new thread, starting index %d", i)
-
-			go cfg.Get_skins(i)
-		}
-
-		cfg.wg.Wait()
-
-		log.Println("Scrapping ended")
-
-	*/
 
 	//Spawning Go Routines for workerpool
 	for i := 0; i < numWorkers; i++ {
+
 		cfg.wg.Add(1)
-		go cfg.Worker(jobs)
+		go cfg.Worker(i, jobs, ticker)
 	}
 
 	for i := 0; i < cfg.totalItems; i += 100 {
@@ -38,9 +29,11 @@ func (cfg *Configure) Run_Scrapper() {
 
 }
 
-func (cfg *Configure) Worker(jobs chan int) {
+func (cfg *Configure) Worker(id int, jobs chan int, ticker *time.Ticker) {
 	defer cfg.wg.Done()
 	for i := range jobs {
+		<-ticker.C
+		log.Printf("Worker %d, requesting items starting %d", id, i)
 		cfg.Get_skins(i)
 	}
 }
