@@ -6,7 +6,7 @@ import (
 )
 
 func (cfg *Configure) Run_Scrapper() {
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(8 * time.Second)
 	defer ticker.Stop()
 	numWorkers := 50
 	jobs := make(chan int, 1000)

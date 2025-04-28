@@ -8,8 +8,6 @@ package database
 import (
 	"context"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 const addPrice = `-- name: AddPrice :many
@@ -20,7 +18,7 @@ RETURNING pricedate, item_id, price
 
 type AddPriceParams struct {
 	Pricedate time.Time
-	ItemID    uuid.UUID
+	ItemID    string
 	Price     float64
 }
 
@@ -53,7 +51,7 @@ FROM Prices
 WHERE Item_id = $1
 `
 
-func (q *Queries) GetPricebyId(ctx context.Context, itemID uuid.UUID) ([]float64, error) {
+func (q *Queries) GetPricebyId(ctx context.Context, itemID string) ([]float64, error) {
 	rows, err := q.db.QueryContext(ctx, getPricebyId, itemID)
 	if err != nil {
 		return nil, err

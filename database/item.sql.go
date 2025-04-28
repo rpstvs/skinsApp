@@ -7,25 +7,21 @@ package database
 
 import (
 	"context"
-
-	"github.com/google/uuid"
 )
 
 const createItem = `-- name: CreateItem :exec
 INSERT INTO Items (
-        id,
         Classid,
         ItemName,
         ImageUrl,
         DayChange,
         WeekChange
     )
-VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, classid, itemname, daychange, weekchange, imageurl
+VALUES ($1, $2, $3, $4, $5)
+RETURNING classid, itemname, daychange, weekchange, imageurl
 `
 
 type CreateItemParams struct {
-	ID         uuid.UUID
 	Classid    string
 	Itemname   string
 	Imageurl   string
@@ -35,7 +31,6 @@ type CreateItemParams struct {
 
 func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) error {
 	_, err := q.db.ExecContext(ctx, createItem,
-		arg.ID,
 		arg.Classid,
 		arg.Itemname,
 		arg.Imageurl,
@@ -45,33 +40,20 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) error {
 	return err
 }
 
-const getItemIDbyName = `-- name: GetItemIDbyName :one
-SELECT id
-FROM Items
-WHERE ItemName = $1
-`
-
-func (q *Queries) GetItemIDbyName(ctx context.Context, itemname string) (uuid.UUID, error) {
-	row := q.db.QueryRowContext(ctx, getItemIDbyName, itemname)
-	var id uuid.UUID
-	err := row.Scan(&id)
-	return id, err
-}
-
 const updatePriceChange = `-- name: UpdatePriceChange :exec
 UPDATE Items
 SET DayChange = $1,
     WeekChange = $2
-WHERE Id = $3
+WHERE Classid = $3
 `
 
 type UpdatePriceChangeParams struct {
 	Daychange  float64
 	Weekchange float64
-	ID         uuid.UUID
+	Classid    string
 }
 
 func (q *Queries) UpdatePriceChange(ctx context.Context, arg UpdatePriceChangeParams) error {
-	_, err := q.db.ExecContext(ctx, updatePriceChange, arg.Daychange, arg.Weekchange, arg.ID)
+	_, err := q.db.ExecContext(ctx, updatePriceChange, arg.Daychange, arg.Weekchange, arg.Classid)
 	return err
 }
