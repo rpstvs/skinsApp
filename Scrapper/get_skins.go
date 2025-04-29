@@ -24,15 +24,16 @@ func (cfg *Configure) Get_skins(start int) {
 
 	if err != nil {
 		log.Println(err)
+		return
 	}
+	defer resp.Body.Close()
 
 	data, err := io.ReadAll(resp.Body)
 
 	if err != nil {
 		log.Println(err)
+		return
 	}
-
-	defer resp.Body.Close()
 
 	results := &SearchResult{}
 
