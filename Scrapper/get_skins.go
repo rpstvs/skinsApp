@@ -17,10 +17,10 @@ func (cfg *Configure) Get_skins(start int) {
 
 	if err != nil {
 		log.Println(err)
-
+		return
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := cfg.client.Do(req)
 
 	if err != nil {
 		log.Println(err)
@@ -41,6 +41,7 @@ func (cfg *Configure) Get_skins(start int) {
 
 	if err != nil {
 		log.Println(err)
+		return
 	}
 
 	if results == nil {

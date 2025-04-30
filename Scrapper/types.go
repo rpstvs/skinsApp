@@ -1,6 +1,7 @@
 package Scrapper
 
 import (
+	"net/http"
 	"sync"
 
 	"github.com/rpstvs/skinsApp/database"
@@ -11,6 +12,7 @@ type Configure struct {
 	totalItems int
 	db         *database.Queries
 	mu         *sync.Mutex
+	client     http.Client
 }
 
 type Item struct {

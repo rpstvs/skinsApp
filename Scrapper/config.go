@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"sync"
 
@@ -25,5 +26,6 @@ func InitConfig(total_items int) *Configure {
 		totalItems: total_items,
 		db:         queries,
 		mu:         &sync.Mutex{},
+		client:     *http.DefaultClient,
 	}
 }
