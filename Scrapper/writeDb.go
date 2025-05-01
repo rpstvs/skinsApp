@@ -11,23 +11,23 @@ func (cfg *Configure) writeToDb(data *SearchResult) {
 	ctx := context.Background()
 	for _, item := range data.Results {
 		cfg.mu.Lock()
-		/*
-			err := cfg.db.CreateItem(ctx, database.CreateItemParams{
 
-				Classid:    item.AssetDescription.Classid,
-				Itemname:   item.AssetDescription.MarketHashName,
-				Imageurl:   BuildImageURL(item.AssetDescription.IconURL),
-				Daychange:  0.00,
-				Weekchange: 0.00,
-			})
+		err := cfg.db.CreateItem(ctx, database.CreateItemParams{
 
-			if err != nil {
-				log.Printf("Item: %s not added to db because %s \n", item.AssetDescription.MarketHashName, err)
-			}
-		*/
+			Classid:    item.AssetDescription.Classid,
+			Itemname:   item.AssetDescription.MarketHashName,
+			Imageurl:   BuildImageURL(item.AssetDescription.IconURL),
+			Daychange:  0.00,
+			Weekchange: 0.00,
+		})
+
+		if err != nil {
+			log.Printf("Item: %s not added to db because %s \n", item.AssetDescription.MarketHashName, err)
+		}
+
 		log.Printf("Item Added: %s - Daily Change %s \n", item.HashName, item.SalePriceText)
 
-		_, err := cfg.db.AddPrice(ctx, database.AddPriceParams{
+		_, err = cfg.db.AddPrice(ctx, database.AddPriceParams{
 			Pricedate: ConvertDate(),
 			ItemID:    item.AssetDescription.Classid,
 			Price:     PriceConverter(item.SalePriceText),
