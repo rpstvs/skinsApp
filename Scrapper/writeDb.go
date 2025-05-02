@@ -11,9 +11,7 @@ func (cfg *Configure) writeToDb(data *SearchResult) {
 	ctx := context.Background()
 	for _, item := range data.Results {
 		cfg.mu.Lock()
-
 		err := cfg.db.CreateItem(ctx, database.CreateItemParams{
-
 			Classid:    item.AssetDescription.Classid,
 			Itemname:   item.AssetDescription.MarketHashName,
 			Imageurl:   BuildImageURL(item.AssetDescription.IconURL),
@@ -22,10 +20,8 @@ func (cfg *Configure) writeToDb(data *SearchResult) {
 		})
 
 		if err != nil {
-			log.Printf("Item: %s not added to db because %s \n", item.AssetDescription.MarketHashName, err)
+			log.Printf("Item: %s, class id: %s , err: %s \n", item.AssetDescription.MarketHashName, item.AssetDescription.Classid, err)
 		}
-
-		log.Printf("Item Added: %s - Daily Change %s \n", item.HashName, item.SalePriceText)
 
 		_, err = cfg.db.AddPrice(ctx, database.AddPriceParams{
 			Pricedate: ConvertDate(),
@@ -40,7 +36,9 @@ func (cfg *Configure) writeToDb(data *SearchResult) {
 		}
 
 		cfg.UpdateChange(ctx, item.AssetDescription.Classid)
+
 		cfg.mu.Unlock()
+
 		log.Printf("Updating Item: %s - Daily Change %s.2 \n", item.HashName, item.SalePriceText)
 	}
 }
